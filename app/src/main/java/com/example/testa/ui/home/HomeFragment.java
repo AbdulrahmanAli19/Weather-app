@@ -7,6 +7,8 @@ import static com.example.testa.pojo.Utilities.setIcon;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,18 +30,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.testa.databinding.HomeFragmentBinding;
 import com.example.testa.pojo.modules.DayDetails;
 import com.example.testa.pojo.modules.WeatherRespon;
+import com.example.testa.pojo.permissionHelper.FragmentPermissionHelper;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-public class HomeFragment extends Fragment implements OnDataReceived {
+public class HomeFragment extends Fragment implements OnDataReceived, LocationListener {
 
     private HomeViewModel mViewModel;
     private HomeFragmentBinding binding;
     private NavController navController;
     private WeatherRespon weatherRespon;
     private FragmentActivity fragmentActivity;
+    private LocationManager locationManager;
 
     private final String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -110,16 +114,9 @@ public class HomeFragment extends Fragment implements OnDataReceived {
 
     @SuppressLint("MissingPermission")
     public void getWeatherData() {
-        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
 
-        OnDataReceived onDataReceived = this;
-
-        locationManager.requestLocationUpdates("gps", 4000, 0f, location -> {
-            String lat = String.valueOf(location.getLatitude());
-            String lon = String.valueOf(location.getLongitude());
-            mViewModel.getDataFromAPI(lat, lon, onDataReceived);
-        });
-
+        locationManager.requestLocationUpdates("gps", 4000, 0f, this);
 
     }
 
@@ -140,8 +137,17 @@ public class HomeFragment extends Fragment implements OnDataReceived {
 
         ArrayList<DayDetails> dayDetails = new ArrayList<>();
         fillCurrentDayArray(weatherRespon, dayDetails);
-        Log.d(TAG, "onResponse: called.");
         binding.recyclerView.setAdapter(new CurrentDayAdapter(getContext(), dayDetails));
     }
 
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        OnDataReceived onDataReceived = this;
+        String lat = String.valueOf(location.getLatitude());
+        String lon = String.valueOf(location.getLongitude());
+        mViewModel.getDataFromAPI(lat, lon, onDataReceived);
+        Log.d(TAG, "getWeatherData: called");
+        locationManager.removeUpdates(this);
+
+    }
 }

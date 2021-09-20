@@ -1,4 +1,4 @@
-package com.example.testa.ui.home;
+package com.example.testa.pojo.permissionHelper;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;

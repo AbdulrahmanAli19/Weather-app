@@ -42,7 +42,6 @@ public class HomeFragment extends Fragment implements OnDataReceived {
     private FragmentActivity fragmentActivity;
 
     private final String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.CAMERA,
             Manifest.permission.ACCESS_COARSE_LOCATION};
 
     @Override
@@ -55,14 +54,7 @@ public class HomeFragment extends Fragment implements OnDataReceived {
 
         if (isPermissionsGranted())
             getWeatherData();
-        else
-            do {
-                Log.d(TAG, "onCreateView: ");
-                isPermissionsGranted();
-            } while (!isPermissionsGranted());
 
-        if (isPermissionsGranted())
-            getWeatherData();
 
         binding.txtNext.setOnClickListener(v -> navController.navigate(HomeFragmentDirections
                 .actionNavigationHomeToNavigationNotifications(weatherRespon)));
@@ -75,27 +67,24 @@ public class HomeFragment extends Fragment implements OnDataReceived {
         boolean isGranted = true;
 
         for (String permission : permissions) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), permission) == PERMISSION_DENIED)
-                getPermissions(permission);
-
-        }
-
-        for (String permission : permissions) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), permission) == PERMISSION_DENIED) {
+            if (ActivityCompat.checkSelfPermission(getContext(), permission) == PERMISSION_DENIED) {
                 isGranted = false;
+                reqPermission(permission);
                 break;
-            }
+            } else isGranted = true;
         }
-
         return isGranted;
     }
 
-    private void getPermissions(String permission) {
+    private void reqPermission(String permission) {
         new FragmentPermissionHelper().getUserPermission(fragmentActivity, isGranted -> {
             if (isGranted) {
                 Toast.makeText(getContext(), permission + " Granted", Toast.LENGTH_SHORT).show();
+                if (isPermissionsGranted())
+                    getWeatherData();
             } else {
                 Toast.makeText(getContext(), permission + " Denied", Toast.LENGTH_SHORT).show();
+                reqPermission(permission);
             }
         }, permission);
 

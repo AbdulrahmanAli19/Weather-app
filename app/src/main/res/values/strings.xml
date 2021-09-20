@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">TestA</string>
+
+
+    <string name="wind">Wind</string>
+    <string name="feels_like">Feels like</string>
+    <string name="humidity">humidity</string>
+    <string name="pressure">Pressure</string>
+    <string name="today">Today</string>
+    <string name="next_5_days">Next 5 Days</string>
+    <string name="title_home">Home</string>
+    <string name="title_next_days">Next 5 days</string>
+</resources>
